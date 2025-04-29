@@ -104,6 +104,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // --- History methods ---
+    public void deleteConnection(String ip) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_HISTORY, COL_HISTORY_IP + " = ?", new String[]{ip});
+        db.close();
+    }
+
     public void addConnectionToHistory(String ip, int port) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues cv = new ContentValues();
