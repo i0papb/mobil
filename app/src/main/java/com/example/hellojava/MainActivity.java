@@ -1,102 +1,84 @@
 package com.example.hellojava;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.IOException;
-
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
+    private DatabaseHelper db;
+    private KlipperApi api;
 
-    private static final String TAG = "MainActivity";
-
-    private TextView extruderTemp;
-    private TextView bedTemp;
+    private TextView    tvStatus;
+    private ProgressBar progress;
+    private Button      btnRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        db          = new DatabaseHelper(this);
+        tvStatus    = findViewById(R.id.tv_status);
+        progress    = findViewById(R.id.progress);
+        btnRefresh  = findViewById(R.id.btn_refresh);
 
-        extruderTemp = findViewById(R.id.extruderTemp);
-        bedTemp = findViewById(R.id.bedTemp);
+        initApi();
+        btnRefresh.setOnClickListener(v -> fetchPrinterStatus());
 
-        // First discover what the printer supports
-        discoverObjects();
+        // initial load
+        fetchPrinterStatus();
     }
 
-    private void discoverObjects() {
-        KlipperApi api = ApiClient.getApi(this);
+    private void initApi() {
+        String ip   = db.getLastIpAddress();
+        int    port = db.getApiPort();
+        String base = "http://" + ip + ":" + port + "/";
 
-        api.listObjects().enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    try {
-                        String body = response.body().string();
-                        Log.d(TAG, "Available objects: " + body);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(base)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-                        // Once confirmed, query for temperature
-                        fetchPrinterStatus();
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    Toast.makeText(MainActivity.this, "Failed to discover objects", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e(TAG, "Error listing objects", t);
-                Toast.makeText(MainActivity.this, "Error discovering objects", Toast.LENGTH_SHORT).show();
-            }
-        });
+        api = retrofit.create(KlipperApi.class);
     }
 
     private void fetchPrinterStatus() {
-        KlipperApi api = ApiClient.getApi(this);
+        tvStatus.setVisibility(View.INVISIBLE);
+        progress.setVisibility(View.VISIBLE);
 
-        // Ask Moonraker for just the extruder and heater_bed blocks
-        api.queryObjects("extruder,heater_bed").enqueue(new Callback<PrinterObjectsResponse>() {
+        Call<PrinterStatusResponse> call = api.getPrinterStatus();
+        call.enqueue(new Callback<PrinterStatusResponse>() {
             @Override
-            public void onResponse(Call<PrinterObjectsResponse> call,
-                                   Response<PrinterObjectsResponse> resp) {
-                if (resp.isSuccessful() && resp.body() != null && resp.body().getResult() != null) {
-                    PrinterObjectsResponse.Status st = resp.body().getResult().getStatus();
-
-                    if (st.getExtruder() != null) {
-                        extruderTemp.setText(getString(R.string.extruder_temp,
-                                st.getExtruder().getTemperature()));
-                    }
-
-                    if (st.getHeaterBed() != null) {
-                        bedTemp.setText(getString(R.string.bed_temp,
-                                st.getHeaterBed().getTemperature()));
-                    }
-
-                    Log.d(TAG, "Printer status updated via objects/query");
-                } else {
-                    Log.w(TAG, "objects/query response not successful");
+            public void onResponse(Call<PrinterStatusResponse> call,
+                                   Response<PrinterStatusResponse> res) {
+                progress.setVisibility(View.GONE);
+                if (!res.isSuccessful() || res.body() == null) {
                     Toast.makeText(MainActivity.this,
-                            "Failed to fetch status", Toast.LENGTH_SHORT).show();
+                            "API error: " + res.code(),
+                            Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                String state = res.body().getState();
+                tvStatus.setText("State: " + state);
+                tvStatus.setVisibility(View.VISIBLE);
             }
 
             @Override
-            public void onFailure(Call<PrinterObjectsResponse> call, Throwable t) {
-                Log.e(TAG, "Error querying objects", t);
+            public void onFailure(Call<PrinterStatusResponse> call, Throwable t) {
+                progress.setVisibility(View.GONE);
                 Toast.makeText(MainActivity.this,
-                        "Error fetching printer status", Toast.LENGTH_SHORT).show();
+                        "Network error: " + t.getMessage(),
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
