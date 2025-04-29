@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HelloJava</string>
+    <string name="extruder_temp">Extruder: %.1f °C</string>
+    <string name="bed_temp">Bed: %.1f °C</string>
+    <string name="error_enter_ip">Please enter a printer IP</string>
+    <string name="error_invalid_port">Invalid port number</string>
+</resources>

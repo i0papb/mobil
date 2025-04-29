@@ -1,0 +1,23 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+        // JitPack for any Gradle plugins hosted there
+        maven { url = "https://jitpack.io" }
+    }
+}
+
+dependencyResolutionManagement {
+    // Force all projects to use only these repos
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        // JitPack for runtime artifacts (ipcam-view, etc.)
+        maven { url = "https://jitpack.io" }
+    }
+}
+
+rootProject.name = "HelloJava"
+include(":app")
