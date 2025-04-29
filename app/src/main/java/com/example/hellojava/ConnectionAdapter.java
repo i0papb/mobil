@@ -6,7 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.List;
 
 public class ConnectionAdapter extends RecyclerView.Adapter<ConnectionAdapter.ViewHolder> {
@@ -26,7 +28,7 @@ public class ConnectionAdapter extends RecyclerView.Adapter<ConnectionAdapter.Vi
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_2, parent, false);
+        View v = LayoutInflater.from(context).inflate(R.layout.item_connection, parent, false);
         return new ViewHolder(v);
     }
 
@@ -34,7 +36,7 @@ public class ConnectionAdapter extends RecyclerView.Adapter<ConnectionAdapter.Vi
     public void onBindViewHolder(ViewHolder holder, int position) {
         String connection = connections.get(position);
         holder.textView.setText(connection);
-        holder.button.setOnClickListener(v -> deleteClickListener.onDeleteClick(connection));
+        holder.deleteButton.setOnClickListener(v -> deleteClickListener.onDeleteClick(connection));
     }
 
     @Override
@@ -42,16 +44,14 @@ public class ConnectionAdapter extends RecyclerView.Adapter<ConnectionAdapter.Vi
         return connections.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
-        Button button;
+        Button deleteButton;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            textView = itemView.findViewById(android.R.id.text1);
-            button = new Button(context);
-            button.setText("Delete");
-            ((ViewGroup) itemView).addView(button);
+            textView = itemView.findViewById(R.id.connectionTextView);
+            deleteButton = itemView.findViewById(R.id.deleteButton);
         }
     }
 }
