@@ -14,14 +14,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int    DATABASE_VERSION = 2;
 
     // Settings table
-    private static final String TABLE_SETTINGS    = "settings";
-    private static final String COLUMN_KEY        = "setting_key";
-    private static final String COLUMN_VALUE      = "value";
+    private static final String TABLE_SETTINGS   = "settings";
+    private static final String COLUMN_KEY       = "setting_key";
+    private static final String COLUMN_VALUE     = "value";
 
     // History table
-    private static final String TABLE_HISTORY     = "connection_history";
-    private static final String COL_HISTORY_IP    = "ip";
-    private static final String COL_HISTORY_PORT  = "port";
+    private static final String TABLE_HISTORY    = "connection_history";
+    private static final String COL_HISTORY_ID   = "id";
+    private static final String COL_HISTORY_IP   = "ip";
+    private static final String COL_HISTORY_PORT = "port";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -32,15 +33,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Create settings table
         String createSettings =
                 "CREATE TABLE " + TABLE_SETTINGS + " ("
-                        + COLUMN_KEY + " TEXT PRIMARY KEY, "
+                        + COLUMN_KEY   + " TEXT PRIMARY KEY, "
                         + COLUMN_VALUE + " TEXT)";
         db.execSQL(createSettings);
 
         // Create connection history table
         String createHistory =
                 "CREATE TABLE " + TABLE_HISTORY + " ("
-                        + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                        + COL_HISTORY_IP + " TEXT, "
+                        + COL_HISTORY_ID   + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        + COL_HISTORY_IP   + " TEXT, "
                         + COL_HISTORY_PORT + " INTEGER, "
                         + "UNIQUE(" + COL_HISTORY_IP + ", " + COL_HISTORY_PORT + "))";
         db.execSQL(createHistory);
@@ -52,8 +53,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // Add history table in v2
             String createHistory =
                     "CREATE TABLE " + TABLE_HISTORY + " ("
-                            + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                            + COL_HISTORY_IP + " TEXT, "
+                            + COL_HISTORY_ID   + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                            + COL_HISTORY_IP   + " TEXT, "
                             + COL_HISTORY_PORT + " INTEGER, "
                             + "UNIQUE(" + COL_HISTORY_IP + ", " + COL_HISTORY_PORT + "))";
             db.execSQL(createHistory);
@@ -77,7 +78,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 TABLE_SETTINGS,
                 new String[]{COLUMN_VALUE},
                 COLUMN_KEY + " = ?",
-                new String[]{key}, null, null, null
+                new String[]{key},
+                null, null, null
         );
         String value = null;
         if (cursor.moveToFirst()) {
@@ -126,13 +128,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.query(
                 TABLE_HISTORY,
                 new String[]{COL_HISTORY_IP},
-                null,null,null,null,
-                "id DESC"
+                null, null, null, null,
+                COL_HISTORY_ID + " DESC"
         );
         while (cursor.moveToNext()) {
             list.add(cursor.getString(0));
         }
-        cursor.close(); db.close();
+        cursor.close();
+        db.close();
         return list;
     }
 
@@ -142,13 +145,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.query(
                 TABLE_HISTORY,
                 new String[]{COL_HISTORY_PORT},
-                null,null,null,null,
-                "id DESC"
+                null, null, null, null,
+                COL_HISTORY_ID + " DESC"
         );
         while (cursor.moveToNext()) {
             list.add(cursor.getInt(0));
         }
-        cursor.close(); db.close();
+        cursor.close();
+        db.close();
         return list;
+    }
+
+    public List<Connection> getRecentConnections() {
+        List<Connection> results = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+
+        String sql = "SELECT "
+                + COL_HISTORY_IP   + ", "
+                + COL_HISTORY_PORT
+                + " FROM " + TABLE_HISTORY
+                + " ORDER BY " + COL_HISTORY_ID + " DESC LIMIT 10";
+        Cursor c = db.rawQuery(sql, null);
+
+        if (c.moveToFirst()) {
+            do {
+                String ip   = c.getString(c.getColumnIndexOrThrow(COL_HISTORY_IP));
+                int    port = c.getInt   (c.getColumnIndexOrThrow(COL_HISTORY_PORT));
+                results.add(new Connection(ip, port));
+            } while (c.moveToNext());
+        }
+
+        c.close();
+        db.close();
+        return results;
     }
 }

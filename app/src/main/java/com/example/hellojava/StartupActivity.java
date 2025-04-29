@@ -39,7 +39,7 @@ public class StartupActivity extends AppCompatActivity {
         Log.d("StartupActivity", "Recent connections count: " + recentConnectionsList.size());
 
         // Set up adapter with the list
-        adapter = new RecentConnectionsAdapter(recentConnectionsList);
+        adapter = new ConnectionAdapter(recentConnectionsList);
         recentConnectionsRecyclerView.setAdapter(adapter);
 
         // Notify adapter to refresh UI
