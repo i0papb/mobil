@@ -1,17 +1,19 @@
+package com.example.hellojava;
+
 public class Connection {
-    private String name;
-    private String address;
+    private final String ip;
+    private final int port;
 
-    public Connection(String name, String address) {
-        this.name = name;
-        this.address = address;
+    public Connection(String ip, int port) {
+        this.ip = ip;
+        this.port = port;
     }
 
-    public String getName() {
-        return name;
+    public String getIp() {
+        return ip;
     }
 
-    public String getAddress() {
-        return address;
+    public int getPort() {
+        return port;
     }
 }

@@ -2,10 +2,6 @@ package com.example.hellojava;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,45 +9,32 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class StartupActivity extends AppCompatActivity {
-
-    private RecyclerView recentConnectionsRecyclerView;
-    private RecentConnectionsAdapter adapter;
-    private List<Connection> recentConnectionsList;
-    private DatabaseHelper databaseHelper;
-    private Button connectBtn;
+    private DatabaseHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_startup);
 
-        connectBtn = findViewById(R.id.connectBtn);
-        recentConnectionsRecyclerView = findViewById(R.id.recentConnectionsRecyclerView);
+        db = new DatabaseHelper(this);
+        List<Connection> history = db.getRecentConnections();
 
-        // Set up the layout manager
-        recentConnectionsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        RecyclerView rv = findViewById(R.id.recycler_history);
+        rv.setLayoutManager(new LinearLayoutManager(this));
+        ConnectionAdapter adapter = new ConnectionAdapter(
+                history,
+                conn -> {
+                    // on click: save as last-used and go to MainActivity
+                    db.setSetting("ip", conn.getIp());
+                    db.setSetting("api_port", String.valueOf(conn.getPort()));
+                    startActivity(new Intent(this, MainActivity.class));
+                    finish();
+                });
+        rv.setAdapter(adapter);
 
-        // Initialize database helper and get recent connections
-        databaseHelper = new DatabaseHelper(this);
-        recentConnectionsList = databaseHelper.getRecentConnections();
-
-        // Log list size for debugging
-        Log.d("StartupActivity", "Recent connections count: " + recentConnectionsList.size());
-
-        // Set up adapter with the list
-        adapter = new ConnectionAdapter(recentConnectionsList);
-        recentConnectionsRecyclerView.setAdapter(adapter);
-
-        // Notify adapter to refresh UI
-        adapter.notifyDataSetChanged();
-
-        // Handle button click
-        connectBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(StartupActivity.this, ConnectActivity.class);
-                startActivity(intent);
-            }
-        });
+        // optionally, a button to open ConnectActivity for a new entry
+        findViewById(R.id.btn_new).setOnClickListener(v ->
+                startActivity(new Intent(this, ConnectActivity.class))
+        );
     }
 }

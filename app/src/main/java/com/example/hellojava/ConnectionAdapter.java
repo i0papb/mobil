@@ -1,57 +1,58 @@
+
 package com.example.hellojava;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
-
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.List;
 
-public class ConnectionAdapter extends RecyclerView.Adapter<ConnectionAdapter.ViewHolder> {
-    private List<String> connections;
-    private Context context;
-    private OnDeleteClickListener deleteClickListener;
+public class ConnectionAdapter
+        extends RecyclerView.Adapter<ConnectionAdapter.ViewHolder> {
 
-    public interface OnDeleteClickListener {
-        void onDeleteClick(String connection);
+    private final List<Connection> items;
+    private final OnClickListener clickListener;
+
+    public interface OnClickListener {
+        void onItemClick(Connection conn);
     }
 
-    public ConnectionAdapter(Context ctx, List<String> connections, OnDeleteClickListener listener) {
-        this.context = ctx;
-        this.connections = connections;
-        this.deleteClickListener = listener;
+    public ConnectionAdapter(List<Connection> items, OnClickListener lc) {
+        this.items = items;
+        this.clickListener = lc;
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(context).inflate(R.layout.item_connection, parent, false);
+    public ViewHolder onCreateViewHolder(
+            @NonNull ViewGroup parent, int viewType) {
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_connection, parent, false);
         return new ViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        String connection = connections.get(position);
-        holder.textView.setText(connection);
-        holder.deleteButton.setOnClickListener(v -> deleteClickListener.onDeleteClick(connection));
+    public void onBindViewHolder(
+            @NonNull ViewHolder vh, int position) {
+        Connection c = items.get(position);
+        vh.ipText.setText(c.getIp());
+        vh.portText.setText(String.valueOf(c.getPort()));
+        vh.itemView.setOnClickListener(v -> clickListener.onItemClick(c));
     }
 
     @Override
     public int getItemCount() {
-        return connections.size();
+        return items.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView textView;
-        Button deleteButton;
-
-        public ViewHolder(View itemView) {
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        final TextView ipText, portText;
+        ViewHolder(View itemView) {
             super(itemView);
-            textView = itemView.findViewById(R.id.connectionTextView);
-            deleteButton = itemView.findViewById(R.id.deleteButton);
+            ipText   = itemView.findViewById(R.id.tv_ip);
+            portText = itemView.findViewById(R.id.tv_port);
         }
     }
 }
