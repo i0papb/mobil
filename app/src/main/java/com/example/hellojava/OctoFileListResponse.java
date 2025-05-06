@@ -16,10 +16,10 @@ public class OctoFileListResponse {
         public String path;
 
         @SerializedName("modified")
-        public double modified;      // timestamp if you need it
+        public double modified;      // timestamp
 
         @SerializedName("size")
-        public long size;           // bytes if you need it
+        public long size;           // bytes
 
         @SerializedName("permissions")
         public String permissions;  // e.g. "rw"

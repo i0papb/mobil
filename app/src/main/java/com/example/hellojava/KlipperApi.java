@@ -26,4 +26,8 @@ public interface KlipperApi {
     /** Query arbitrary printer objects (e.g. print_stats, virtual_sdcard) */
     @GET("/printer/objects/query")
     Call<ObjectsQueryResponse> queryObjects(@Query("objects") String objects);
+
+    /** NEW: Query temperatures and fans */
+    @GET("/printer/objects/query")
+    Call<TempFanResponse> queryTempFan(@Query("objects") String objects);
 }
