@@ -2,36 +2,34 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.hellojava">
 
-    <!-- Required permissions -->
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:usesCleartextTraffic="true"
-        android:supportsRtl="true"
         android:theme="@style/Theme.HelloJava">
 
-        <!-- Entry point -->
+        <!-- MAIN LAUNCHER: must export -->
         <activity
-            android:name=".StartupActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
-        <!-- Screen to enter a new connection -->
+        <!-- STATUS SCREEN: not exported to other apps -->
         <activity
-            android:name=".ConnectActivity"
-            android:exported="true" />
+            android:name=".StatusActivity"
+            android:exported="false" />
 
-        <!-- Your existing main screen -->
+        <!-- OBJECTS SCREEN: not exported -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ObjectsActivity"
             android:exported="false" />
 
     </application>

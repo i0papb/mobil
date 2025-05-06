@@ -1,9 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_home"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="Home"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_status"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="Temp and Fan"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_objects"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:title="Print Objects"
+        app:showAsAction="never" />
+
     <item
         android:id="@+id/action_change_ip"
-        android:title="Change IP Address"
-        android:orderInCategory="100"
-        app:showAsAction="never"/>
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="Change   IP   Address"
+        app:showAsAction="never" />
+
 </menu>
