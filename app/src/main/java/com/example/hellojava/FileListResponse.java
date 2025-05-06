@@ -3,6 +3,7 @@ package com.example.hellojava;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
+/** Response for /server/files/list */
 public class FileListResponse {
     @SerializedName("files")
     public List<FileEntry> files;
@@ -10,8 +11,6 @@ public class FileListResponse {
     public static class FileEntry {
         @SerializedName("filename")
         public String filename;
-        // You can add size/date if you like:
-        // @SerializedName("modified")
-        // public String modified;
+        // you can add size, modified, etc. here if desired
     }
 }
