@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- one item per layout file in your res/layout folder -->
+    <item
+        android:id="@+id/action_activity_main"
+        android:title="Main Screen"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_camera_view"
+        android:title="Camera View"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="Settings"
+        android:showAsAction="never" />
+
+    <!-- …and so on for each of your layouts:
+         android:id="@+id/action_<layout_name>"
+         android:title="<Friendly Title>"
+    -->
+</menu>
